@@ -8,10 +8,15 @@ const useField = (type) => {
     setValue(event.target.value)
   }
 
+  const reset = () => {
+    setValue('')
+  }
+
   return {
     type,
     value,
-    onChange
+    onChange,
+    reset
   }
 }
 
@@ -32,7 +37,6 @@ const useResource = (baseUrl) => {
     getAll()
   }, [baseUrl])
 
-  // ...
   const getResources = async (baseUrl) => {
     const response = await axios.get(baseUrl)
     return response.data
@@ -53,9 +57,9 @@ const useResource = (baseUrl) => {
 }
 
 const App = () => {
-  const content = useField('text')
-  const name = useField('text')
-  const number = useField('text')
+  const { reset: resetNote, ...content } = useField('text')
+  const { reset: resetName, ...name } = useField('text')
+  const { reset: resetNumber, ...number } = useField('text')
 
   const [notes, noteService] = useResource('http://localhost:3005/notes')
   const [persons, personService] = useResource('http://localhost:3005/persons')
@@ -63,11 +67,14 @@ const App = () => {
   const handleNoteSubmit = async (event) => {
     event.preventDefault()
     await noteService.create({ content: content.value })
+    resetNote()
   }
 
   const handlePersonSubmit = async (event) => {
     event.preventDefault()
     await personService.create({ name: name.value, number: number.value })
+    resetName()
+    resetNumber()
   }
 
   return (
